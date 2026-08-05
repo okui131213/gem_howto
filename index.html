@@ -16,19 +16,37 @@
             background-color: #f8fafc;
             color: #0f172a;
         }
+        /* 印刷・PDF崩れ防止のための完璧なメディアクエリ設定 */
         @media print {
             .no-print {
                 display: none !important;
             }
             body {
                 background-color: #ffffff !important;
-            }
-            .print-break-inside-avoid {
-                break-inside: avoid;
+                color: #000000 !important;
+                font-size: 10pt;
             }
             .page-container {
                 max-width: 100% !important;
                 padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* 改ページ制御（カードやブロックが分割されて途切れるのを強力に防止） */
+            .print-avoid-break, .card, pre, border, [class*="rounded-"] {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            h1, h2, h3, h4 {
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+            }
+            section {
+                break-inside: auto;
+            }
+            /* 印刷時もTailwindの色・背景色を完璧に反映 */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
         }
     </style>
@@ -36,28 +54,28 @@
 <body class="antialiased min-h-screen flex flex-col justify-between">
 
     <!-- Header / Hero Section -->
-    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b-4 border-blue-600 shadow-xl">
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b-4 border-blue-600 shadow-xl print-avoid-break">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
             <div class="flex items-center gap-3 mb-3">
                 <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Gem Operational Manual</span>
-                <span class="text-slate-400 text-xs">Ver 2.0 (Optimized)</span>
+                <span class="text-slate-400 text-xs">Ver 3.0 (PDF Perfect Fix)</span>
             </div>
             <h1 class="text-2xl sm:text-4xl font-black tracking-tight leading-tight mb-4">
                 【完全ガイド】選考対策HTML生成Gem<br class="hidden sm:inline">の作り方・使い方・運用レジュメ
             </h1>
             <p class="text-slate-300 text-sm sm:text-base max-w-3xl leading-relaxed">
-                GeminiのカスタムGem機能とNotebookLMを組み合わせ、企業情報から「選考対策＆企業魅力完全ガイド（HTML）」を1発で自動生成するためのチーム共有用完全マニュアル。
+                GeminiのカスタムGem機能とNotebookLMを組み合わせ、企業情報から「選考対策＆企業魅力完全ガイド（HTML）」を自動生成するためのチーム共有用完全マニュアル。
             </p>
         </div>
 
-        <!-- Sticky Navigation Bar -->
+        <!-- Sticky Navigation Bar (印刷時非表示) -->
         <nav class="bg-slate-900/90 backdrop-blur border-t border-slate-800 sticky top-0 z-50 no-print">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto text-xs sm:text-sm font-medium py-3 gap-6 text-slate-300 no-scrollbar">
                 <a href="#section-workflow" class="hover:text-blue-400 whitespace-nowrap transition-colors">1. ワークフロー</a>
                 <a href="#section-gem-setup" class="hover:text-blue-400 whitespace-nowrap transition-colors">2. Gem設定手順</a>
                 <a href="#section-format" class="hover:text-blue-400 whitespace-nowrap transition-colors">3. 入力フォーマット</a>
                 <a href="#section-notebooklm" class="hover:text-blue-400 whitespace-nowrap transition-colors">4. NotebookLM連携</a>
-                <a href="#section-tips" class="hover:text-blue-400 whitespace-nowrap transition-colors">5. クオリティ向上Tips</a>
+                <a href="#section-pdf-fix" class="hover:text-blue-400 whitespace-nowrap transition-colors">5. 印刷・PDF崩れ対策</a>
             </div>
         </nav>
     </header>
@@ -66,7 +84,7 @@
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 flex-grow page-container">
 
         <!-- SECTION 1: Workflow -->
-        <section id="section-workflow" class="scroll-mt-20 print-break-inside-avoid">
+        <section id="section-workflow" class="scroll-mt-20 print-avoid-break">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. 仕組みと全体ワークフロー</h2>
@@ -77,7 +95,7 @@
 
             <!-- Flow Diagram (Tailwind Step Flow) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">STEP 01</span>
@@ -88,7 +106,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">STEP 02</span>
@@ -99,7 +117,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">STEP 03</span>
@@ -110,7 +128,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-xl border border-blue-300 bg-blue-50/30 shadow-sm relative flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-blue-300 bg-blue-50/30 shadow-sm relative flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-xs font-bold text-white bg-blue-600 px-2.5 py-1 rounded-md">STEP 04</span>
@@ -125,13 +143,13 @@
 
 
         <!-- SECTION 2: Gem Setup -->
-        <section id="section-gem-setup" class="scroll-mt-20 print-break-inside-avoid">
+        <section id="section-gem-setup" class="scroll-mt-20">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. Gemini「カスタムGem」の設定手順</h2>
             </div>
             
-            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mb-6">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mb-6 print-avoid-break">
                 <div class="p-6">
                     <h3 class="text-base font-bold text-slate-800 mb-4">Gem設定画面に入力するパラメーター</h3>
                     <div class="overflow-x-auto">
@@ -149,12 +167,12 @@
                                 </tr>
                                 <tr>
                                     <td class="p-3 font-bold text-slate-700 bg-slate-50">説明</td>
-                                    <td class="p-3 text-slate-800">企業情報と対策テキストから、高品質な単一HTML対策ガイドを生成する。</td>
+                                    <td class="p-3 text-slate-800">企業情報と対策テキストから、印刷崩れのない高品質な単一HTML対策ガイドを生成する。</td>
                                 </tr>
                                 <tr>
                                     <td class="p-3 font-bold text-slate-700 bg-slate-50">指示 (Instructions)</td>
                                     <td class="p-3 text-slate-800 font-sans">
-                                        最適化されたシステムプロンプト（下記の枠内）をそのまま全文章コピー＆ペーストして貼り付けます。
+                                        印刷崩れ防止コード（`@media print` 改ページ制御）を完全組み込みしたシステムプロンプト（下記の枠内）をそのまま全文章コピーして貼り付けます。
                                     </td>
                                 </tr>
                             </tbody>
@@ -164,9 +182,9 @@
             </div>
 
             <!-- Gem Prompt Box -->
-            <div class="bg-slate-900 text-slate-100 rounded-xl p-5 shadow-lg border border-slate-800">
+            <div class="bg-slate-900 text-slate-100 rounded-xl p-5 shadow-lg border border-slate-800 print-avoid-break">
                 <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-3">
-                    <span class="text-xs font-mono text-blue-400 font-bold">📋 Gemの指示（Instructions）に貼り付ける完成版プロンプト</span>
+                    <span class="text-xs font-mono text-blue-400 font-bold">📋 Gemの指示（Instructions）に貼り付ける【最新・印刷崩れ対策版】プロンプト</span>
                 </div>
                 <pre class="text-xs font-mono leading-relaxed text-slate-300 whitespace-pre-wrap overflow-x-auto p-2">あなたは「プロの採用コンサルタント」兼「優れたフロントエンドデザイナー」です。
 ユーザーから提供される【提供データ】をもとに、候補者向けの「選考対策＆企業魅力完全ガイド」となる高品質な単一HTMLファイル（Single File HTML）コードを出力してください。
@@ -174,15 +192,28 @@
 ### 【絶対遵守事項】
 ・解説メッセージや前置きは最小限にし、すぐにコピペして使える ```html から始まるコードブロックを出力してください。
 ・データに記載されているテキスト（質問内容、NG軸、BETTER軸、模範回答、条件面など）は、要約や省略をせずすべて網羅して盛り込んでください。
+・【印刷・PDF崩れ絶対防止】
+  - styleタグ内に必ず `@media print` 用の改ページ制御CSSを含めてください。
+  - 各カードやブロック要素には `break-inside: avoid;`（および `page-break-inside: avoid;`）を適用し、要素がページの切れ目で裁断されないようにしてください。
+  - 印刷時は背景グラデーションを白地ベースにし、背景色印刷（-webkit-print-color-adjust: exact;）に対応させてください。
 
 ### 【作成・デザイン要件】
 1. **形式:**
    - 外部ファイル（CSS/JS）を分けず、完全な1つの .html ファイルとして出力。
    - スタイリングには CDN経由の Tailwind CSS (&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;) を使用。
    - Google Fonts ("Noto Sans JP") を読み込み、洗練されたフォント・余白・影（box-shadow）を適用。
+   - &lt;style&gt; タグ内に以下の印刷崩れ対策CSSを必ず埋め込むこと：
+     @media print {
+       .no-print { display: none !important; }
+       body { background-color: #ffffff !important; color: #000000 !important; font-size: 11pt; }
+       .card, .border, [class*="rounded-"], pre, blockquote { break-inside: avoid !important; page-break-inside: avoid !important; }
+       header, section { break-inside: auto; }
+       h1, h2, h3, h4 { break-after: avoid !important; page-break-after: avoid !important; }
+       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+     }
 
 2. **構成・レイアウト:**
-   - **ヒーローヘッダー:** 企業カラーを基調としたグラフィック背景、企業名、タイトル、概要、スムーズスクロール対応のナビゲーションタグ。
+   - **ヒーローヘッダー:** 企業カラーを基調としたグラフィック背景、企業名、タイトル、概要、スムーズスクロール対応のナビゲーションタグ（`class="no-print"`を付与）。
    - **SECTION 1: 企業魅力・強み（インフォグラフィック）:**
      - 強みや実績数値をカードデザインで強調。
      - 選考・アサインのプロセス等は、Tailwind CSSによるステップ型のフロー図（ダイアグラム）として視覚化。
@@ -192,13 +223,13 @@
      - 条件面（転勤・勤務地など）の質問・標準回答・実態背景をカード等で整理。
    - **SECTION 3: 想定質問・必須問い対策:**
      - 原文のニュアンス、面接官の意図、NG回答例、BETTER回答例を一切省略せず掲載。
-     - 各質問ごとに「NGな軸（赤系）」「BETTERな軸（緑系）」「重要注意点（オレンジ系）」「具体的な模範回答例（青・緑系）」を装飾ブロックで色分け。
+     - 各質問ごとに「NGな軸（赤系）」「BETTERな軸（緑系）」「重要注意点（オレンジ系）」「具体的な模範回答例（青・緑系）」を装飾ブロック（`break-inside: avoid`対応）で色分け。
    - **SECTION 4: 参考URL集:**
      - 参考URLを、タップしやすいカード型のリンク一覧として設置（`target="_blank"` を付与）。
 
-3. **レスポンシブ＆印刷対応:**
+3. **レスポンシブ＆印刷（A4・PDF）最適化:**
    - スマホ・PC完全対応。
-   - `@media print` 設定を入れ、印刷時にはナビゲーションや不要な装飾が非表示になり、A4で綺麗に印刷できるデザインに調整。
+   - A4印刷・PDF出力時にテキストやカード枠がページの境界線で切れない綺麗な紙面レイアウトを実現すること。
 
 ---
 
@@ -215,7 +246,7 @@
 
 
         <!-- SECTION 3: Format -->
-        <section id="section-format" class="scroll-mt-20 print-break-inside-avoid">
+        <section id="section-format" class="scroll-mt-20 print-avoid-break">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. ユーザーが入力する【提供データ】フォーマット</h2>
@@ -259,7 +290,7 @@
 
 
         <!-- SECTION 4: NotebookLM -->
-        <section id="section-notebooklm" class="scroll-mt-20 print-break-inside-avoid">
+        <section id="section-notebooklm" class="scroll-mt-20 print-avoid-break">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. NotebookLMを活用した「爆速データ整理術」</h2>
@@ -291,62 +322,81 @@
         </section>
 
 
-        <!-- SECTION 5: Tips -->
-        <section id="section-tips" class="scroll-mt-20 print-break-inside-avoid">
+        <!-- SECTION 5: PDF Fix & Printing Tips -->
+        <section id="section-pdf-fix" class="scroll-mt-20">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. クオリティを劇的に引き上げる 4つの Tips</h2>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. 印刷・PDF化でフォーマットを絶対に崩さないコツ</h2>
             </div>
 
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 shadow-sm mb-6 print-avoid-break">
+                <h3 class="text-base font-bold text-amber-900 mb-3 flex items-center gap-2">
+                    <span>⚠️ なぜPDF化すると枠や文字が途中で切れて崩れるのか？</span>
+                </h3>
+                <p class="text-xs text-amber-800 leading-relaxed mb-4">
+                    Tailwind CSS（特に Flex や Grid）は画面表示に特化しているため、何も設定しないとブラウザの印刷機能が<b>「ページの境界線（改ページ位置）」で要素をばっさりと上下に裁断</b>してしまいます。また、標準設定では背景色（カラーボックス）が印刷で消えてしまう仕様になっています。
+                </p>
+                <div class="bg-white p-4 rounded-lg border border-amber-200 text-xs text-slate-700 space-y-2">
+                    <p><b>【完全防止のための3大設定】</b></p>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 pl-2">
+                        <li><b>プロンプトに `break-inside: avoid;` を必須指定する:</b> これによりカードやブロックが自動的に「丸ごと次のページ」に送られ、途中で裁断されなくなります。</li>
+                        <li><b>ブラウザの印刷設定で「背景のグラフィック」をONにする:</b> これを入れないと装飾ボックスの色が消えて文字だけになります。</li>
+                        <li><b>送信先を「PDFに保存」にする:</b> プリンタドライバを挟まず、ブラウザから直接PDF生成を行うことでレイアウト崩れを防ぎます。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Printing Steps Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Tip 1 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-rose-100 text-rose-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 01</span>
-                            <h3 class="font-bold text-slate-800 text-sm">カラーイメージの具現化</h3>
+                            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded">STEP 01</span>
+                            <h3 class="font-bold text-slate-800 text-sm">印刷画面を開く</h3>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            単に「青」と指定するより、「ダークネイビー（#0A192F）とスカイブルー」のようにベース色とアクセント色を補足指定すると、グラデーションやカードのデザイン性が大幅に向上します。
+                            出力されたHTMLをダブルクリックしてChrome等のブラウザで開き、キーボードの <code class="bg-slate-100 text-slate-800 px-1 rounded">Ctrl + P</code>（Macは <code class="bg-slate-100 text-slate-800 px-1 rounded">Cmd + P</code>）を押します。
                         </p>
                     </div>
                 </div>
 
                 <!-- Tip 2 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 02</span>
-                            <h3 class="font-bold text-slate-800 text-sm">「★回答例★」は口語体で入れる</h3>
+                            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded">STEP 02</span>
+                            <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">重要</span>
+                            <h3 class="font-bold text-slate-800 text-sm">詳細設定：「背景のグラフィック」ON</h3>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            回答例はデザイン上ハイライト表示されるため、「〜と考え、〇〇を実行しました」という実際の面接で発話するセリフ形式で入力しておくと候補者にとって実用的になります。
+                            印刷ダイアログの「詳細設定」を開き、<b>「背景のグラフィック」のチェックボックスを必ずON</b>にしてください。（色分けボックスが綺麗に反映されます）
                         </p>
                     </div>
                 </div>
 
                 <!-- Tip 3 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 03</span>
-                            <h3 class="font-bold text-slate-800 text-sm">コードが途中で止まった場合</h3>
+                            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded">STEP 03</span>
+                            <h3 class="font-bold text-slate-800 text-sm">送信先を「PDFに保存」にセット</h3>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            長文HTMLのため生成が途中で止まることがあります。その際は慌てず「<code class="bg-slate-100 text-slate-800 px-1 rounded">コードの続きを ```html から出力してください</code>」と指示を出すと正確に結合できます。
+                            送信先（プリンター）の一覧から「PDFに保存」を選択して「保存」ボタンをクリックします。余白は「デフォルト」または「最小」が推奨です。
                         </p>
                     </div>
                 </div>
 
                 <!-- Tip 4 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between print-avoid-break">
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 04</span>
-                            <h3 class="font-bold text-slate-800 text-sm">保存とPDF化テクニック</h3>
+                            <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 04</span>
+                            <h3 class="font-bold text-slate-800 text-sm">コード生成が途中で止まった時</h3>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            出力コードを <code class="bg-slate-100 text-slate-800 px-1 rounded">選考対策.html</code> で保存しブラウザで開く。<code class="bg-slate-100 text-slate-800 px-1 rounded">Ctrl + P</code>（Macは <code class="bg-slate-100 text-slate-800 px-1 rounded">Cmd + P</code>）を押すと、組み込まれた印刷スタイルによりヘッダー類が消えて綺麗なA4 PDFが作れます。
+                            文字数上限でコードが途中で止まったら「<code class="bg-slate-100 text-slate-800 px-1 rounded">コードの続きを ```html から出力してください</code>」とチャットで送信すれば続きを結合できます。
                         </p>
                     </div>
                 </div>
@@ -357,7 +407,7 @@
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 text-xs text-center py-6 border-t border-slate-800 mt-12 no-print">
-        <p>© 選考対策ガイド HTML Gem 運用マニュアル — Optimized for Gemini & Tailwind CSS</p>
+        <p>© 選考対策ガイド HTML Gem 運用マニュアル — Optimized for Perfect PDF Printing</p>
     </footer>
 
 </body>
