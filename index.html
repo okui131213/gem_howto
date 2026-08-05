@@ -1,332 +1,231 @@
-import weasyprint
-
-html_content = """<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>【完全ガイド】選考対策HTML生成Gemの作り方・使い方・Tipsレジュメ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* PDF印刷時のページ設定 */
-        @page {
-            size: A4;
-            margin: 12mm 15mm;
-            background-color: #f8fafc;
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
-            font-size: 10pt;
-            line-height: 1.6;
-            color: #1e293b;
+            font-family: 'Noto Sans JP', sans-serif;
             background-color: #f8fafc;
-            margin: 0;
-            padding: 20px;
-        }
-
-        /* Web表示用のコンテナ設定 */
-        .page-wrapper {
-            max-width: 850px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .content-inner {
-            padding: 24px;
-        }
-
-        /* Top Header Banner */
-        .header-banner {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #ffffff;
-            padding: 24px 28px;
-            margin: 0;
-            border-bottom: 4px solid #3b82f6;
-        }
-
-        .header-banner h1 {
-            font-size: 18pt;
-            margin: 0 0 6px 0;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-        }
-
-        .header-banner p {
-            font-size: 9.5pt;
-            margin: 0;
-            color: #94a3b8;
-        }
-
-        /* Section Styling */
-        h2 {
-            font-size: 13pt;
-            color: #0f172a;
-            border-left: 5px solid #2563eb;
-            padding-left: 10px;
-            margin: 22px 0 12px 0;
-            page-break-after: avoid;
-            font-weight: 700;
-        }
-
-        h3 {
-            font-size: 11pt;
-            color: #1e40af;
-            margin: 14px 0 8px 0;
-            page-break-after: avoid;
-            font-weight: 700;
-        }
-
-        p {
-            margin: 0 0 10px 0;
-        }
-
-        /* Visual Flow Diagram */
-        .flow-container {
-            margin: 16px 0;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 16px;
-        }
-
-        .flow-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .flow-step {
-            text-align: center;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 10px 8px;
-            width: 21%;
-            vertical-align: top;
-        }
-
-        .flow-step-num {
-            font-size: 8pt;
-            font-weight: bold;
-            color: #2563eb;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-
-        .flow-step-title {
-            font-size: 9.5pt;
-            font-weight: bold;
             color: #0f172a;
         }
-
-        .flow-arrow {
-            text-align: center;
-            font-size: 14pt;
-            color: #94a3b8;
-            width: 5%;
-            vertical-align: middle;
-        }
-
-        /* Cards and Callouts */
-        .card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin-bottom: 14px;
-            page-break-inside: avoid;
-        }
-
-        .tip-box {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 12px 16px;
-            margin: 12px 0;
-            border-radius: 0 6px 6px 0;
-            page-break-inside: avoid;
-        }
-
-        .tip-title {
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 4px;
-            font-size: 10.5pt;
-        }
-
-        /* Code Blocks */
-        pre, code {
-            font-family: "Consolas", "Courier New", monospace;
-        }
-
-        pre {
-            background: #1e293b;
-            color: #f8fafc;
-            padding: 12px 14px;
-            border-radius: 6px;
-            font-size: 8.5pt;
-            line-height: 1.45;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin: 8px 0 12px 0;
-            page-break-inside: avoid;
-        }
-
-        /* Tables */
-        table.data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 12px 0;
-            background: #ffffff;
-            font-size: 9.5pt;
-            page-break-inside: avoid;
-        }
-
-        table.data-table th, table.data-table td {
-            border: 1px solid #cbd5e1;
-            padding: 8px 12px;
-            text-align: left;
-        }
-
-        table.data-table th {
-            background-color: #0f172a;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        table.data-table tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        ul, ol {
-            margin: 0 0 10px 0;
-            padding-left: 20px;
-        }
-
-        li {
-            margin-bottom: 4px;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #e0e7ff;
-            color: #3730a3;
-            font-size: 8pt;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-right: 6px;
-        }
-
-        .footer {
-            margin-top: 30px;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 10px;
-            font-size: 8pt;
-            color: #64748b;
-            text-align: center;
-        }
-
-        /* PDF印刷時の最適化スタイル */
         @media print {
+            .no-print {
+                display: none !important;
+            }
             body {
-                padding: 0;
-                background-color: #ffffff;
+                background-color: #ffffff !important;
             }
-            .page-wrapper {
-                max-width: 100%;
-                border: none;
-                border-radius: 0;
-                box-shadow: none;
+            .print-break-inside-avoid {
+                break-inside: avoid;
             }
-            .content-inner {
-                padding: 0;
-            }
-            .header-banner {
-                margin: -12mm -15mm 20px -15mm;
+            .page-container {
+                max-width: 100% !important;
+                padding: 0 !important;
             }
         }
     </style>
 </head>
-<body>
+<body class="antialiased min-h-screen flex flex-col justify-between">
 
-<div class="page-wrapper">
-    <div class="header-banner">
-        <h1>【完全ガイド】選考対策HTML生成Gemの作り方・使い方・運用レジュメ</h1>
-        <p>GeminiのカスタムGem機能とNotebookLMを組み合わせた「選考対策＆企業魅力完全ガイドHTML」自動生成マニュアル</p>
-    </div>
-
-    <div class="content-inner">
-        <h2>1. 仕組みと全体ワークフロー</h2>
-        <p>企業情報・面接対策などの散在したテキストを入力するだけで、候補者にそのまま共有・印刷（PDF化）可能な<strong>デザイン済みの単一Webページ（HTMLファイル）</strong>を自動生成します。</p>
-
-        <div class="flow-container">
-            <table class="flow-table">
-                <tr>
-                    <td class="flow-step">
-                        <div class="flow-step-num">STEP 1</div>
-                        <div class="flow-step-title">情報収集＆整理</div>
-                        <div style="font-size: 8pt; color: #64748b; margin-top: 4px;">求人票・HP・面接情報をNotebookLMへ集約</div>
-                    </td>
-                    <td class="flow-arrow">→</td>
-                    <td class="flow-step">
-                        <div class="flow-step-num">STEP 2</div>
-                        <div class="flow-step-title">データ抽出</div>
-                        <div style="font-size: 8pt; color: #64748b; margin-top: 4px;">フォーマットに沿ってテキストを抽出</div>
-                    </td>
-                    <td class="flow-arrow">→</td>
-                    <td class="flow-step">
-                        <div class="flow-step-num">STEP 3</div>
-                        <div class="flow-step-title">Gemへ投入</div>
-                        <div style="font-size: 8pt; color: #64748b; margin-top: 4px;">作成したGeminiのトーク画面に入力</div>
-                    </td>
-                    <td class="flow-arrow">→</td>
-                    <td class="flow-step">
-                        <div class="flow-step-num">STEP 4</div>
-                        <div class="flow-step-title">HTML / PDF出力</div>
-                        <div style="font-size: 8pt; color: #64748b; margin-top: 4px;">1つのHTMLとして保存・候補者共有</div>
-                    </td>
-                </tr>
-            </table>
+    <!-- Header / Hero Section -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b-4 border-blue-600 shadow-xl">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Gem Operational Manual</span>
+                <span class="text-slate-400 text-xs">Ver 2.0 (Optimized)</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-black tracking-tight leading-tight mb-4">
+                【完全ガイド】選考対策HTML生成Gem<br class="hidden sm:inline">の作り方・使い方・運用レジュメ
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base max-w-3xl leading-relaxed">
+                GeminiのカスタムGem機能とNotebookLMを組み合わせ、企業情報から「選考対策＆企業魅力完全ガイド（HTML）」を1発で自動生成するためのチーム共有用完全マニュアル。
+            </p>
         </div>
 
-        <h2>2. Gemini「カスタムGem」の設定手順</h2>
-        <p>GeminiのカスタムGem（またはシステム指示文）にプロンプトを設定しておくことで、毎回長い命令文を入力する必要がなくなります。</p>
+        <!-- Sticky Navigation Bar -->
+        <nav class="bg-slate-900/90 backdrop-blur border-t border-slate-800 sticky top-0 z-50 no-print">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto text-xs sm:text-sm font-medium py-3 gap-6 text-slate-300 no-scrollbar">
+                <a href="#section-workflow" class="hover:text-blue-400 whitespace-nowrap transition-colors">1. ワークフロー</a>
+                <a href="#section-gem-setup" class="hover:text-blue-400 whitespace-nowrap transition-colors">2. Gem設定手順</a>
+                <a href="#section-format" class="hover:text-blue-400 whitespace-nowrap transition-colors">3. 入力フォーマット</a>
+                <a href="#section-notebooklm" class="hover:text-blue-400 whitespace-nowrap transition-colors">4. NotebookLM連携</a>
+                <a href="#section-tips" class="hover:text-blue-400 whitespace-nowrap transition-colors">5. クオリティ向上Tips</a>
+            </div>
+        </nav>
+    </header>
 
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th style="width: 25%;">設定項目</th>
-                    <th style="width: 75%;">入力・設定内容</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Gemの名前</strong></td>
-                    <td>対策資料作成／html （または 選考対策HTMLジェネレーター）</td>
-                </tr>
-                <tr>
-                    <td><strong>説明</strong></td>
-                    <td>企業情報と対策テキストから、スタイリッシュな単一HTML対策ガイドを生成する。</td>
-                </tr>
-                <tr>
-                    <td><strong>指示（Instructions）</strong></td>
-                    <td>提示いただいたプロンプトの「### 【作成・デザイン要件】」までをそのまま貼り付けます。（※【提供データ】より上部をシステム指示にします）</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 flex-grow page-container">
 
-        <h2>3. ユーザーが入力する【提供データ】フォーマット</h2>
-        <p>Gemのトーク画面には、以下のフォーマットに沿って企業情報や対策テキストを流し込みます。</p>
+        <!-- SECTION 1: Workflow -->
+        <section id="section-workflow" class="scroll-mt-20 print-break-inside-avoid">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. 仕組みと全体ワークフロー</h2>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                企業情報や対策テキストを入力するだけで、候補者へそのまま共有・印刷（PDF化）可能な<b>デザイン済みの単一Webページ（HTML）</b>を出力します。
+            </p>
 
-        <pre>### 【提供データ】
+            <!-- Flow Diagram (Tailwind Step Flow) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">STEP 01</span>
+                            <span class="text-xl">📚</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base mb-2">情報収集・整理</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">求人票、企業HP、選考フィードバックメモなどをNotebookLMにアップロード。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">STEP 02</span>
+                            <span class="text-xl">⚡</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base mb-2">データ抽出一括変換</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">抽出用プロンプトを使い、フォーマットに沿ったテキストを一瞬で生成。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">STEP 03</span>
+                            <span class="text-xl">🤖</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base mb-2">Gemへのデータ投入</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed">作成したGemini（カスタムGem）のトーク画面に抽出テキストをそのまま送信。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-blue-300 bg-blue-50/30 shadow-sm relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-white bg-blue-600 px-2.5 py-1 rounded-md">STEP 04</span>
+                            <span class="text-xl">🌐</span>
+                        </div>
+                        <h3 class="font-bold text-blue-950 text-base mb-2">HTML / PDF出力</h3>
+                        <p class="text-slate-600 text-xs leading-relaxed">1つの完成されたHTMLコードが出力。保存してブラウザ表示・PDF保存が可能。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 2: Gem Setup -->
+        <section id="section-gem-setup" class="scroll-mt-20 print-break-inside-avoid">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">2. Gemini「カスタムGem」の設定手順</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mb-6">
+                <div class="p-6">
+                    <h3 class="text-base font-bold text-slate-800 mb-4">Gem設定画面に入力するパラメーター</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-slate-900 text-white">
+                                    <th class="p-3 font-semibold w-1/4">設定項目</th>
+                                    <th class="p-3 font-semibold w-3/4">入力・設定内容</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-700 bg-slate-50">Gem の名前</td>
+                                    <td class="p-3 text-slate-800">対策資料作成／html（または 選考対策HTMLジェネレーター）</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-700 bg-slate-50">説明</td>
+                                    <td class="p-3 text-slate-800">企業情報と対策テキストから、高品質な単一HTML対策ガイドを生成する。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-700 bg-slate-50">指示 (Instructions)</td>
+                                    <td class="p-3 text-slate-800 font-sans">
+                                        最適化されたシステムプロンプト（下記の枠内）をそのまま全文章コピー＆ペーストして貼り付けます。
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gem Prompt Box -->
+            <div class="bg-slate-900 text-slate-100 rounded-xl p-5 shadow-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-3">
+                    <span class="text-xs font-mono text-blue-400 font-bold">📋 Gemの指示（Instructions）に貼り付ける完成版プロンプト</span>
+                </div>
+                <pre class="text-xs font-mono leading-relaxed text-slate-300 whitespace-pre-wrap overflow-x-auto p-2">あなたは「プロの採用コンサルタント」兼「優れたフロントエンドデザイナー」です。
+ユーザーから提供される【提供データ】をもとに、候補者向けの「選考対策＆企業魅力完全ガイド」となる高品質な単一HTMLファイル（Single File HTML）コードを出力してください。
+
+### 【絶対遵守事項】
+・解説メッセージや前置きは最小限にし、すぐにコピペして使える ```html から始まるコードブロックを出力してください。
+・データに記載されているテキスト（質問内容、NG軸、BETTER軸、模範回答、条件面など）は、要約や省略をせずすべて網羅して盛り込んでください。
+
+### 【作成・デザイン要件】
+1. **形式:**
+   - 外部ファイル（CSS/JS）を分けず、完全な1つの .html ファイルとして出力。
+   - スタイリングには CDN経由の Tailwind CSS (&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;) を使用。
+   - Google Fonts ("Noto Sans JP") を読み込み、洗練されたフォント・余白・影（box-shadow）を適用。
+
+2. **構成・レイアウト:**
+   - **ヒーローヘッダー:** 企業カラーを基調としたグラフィック背景、企業名、タイトル、概要、スムーズスクロール対応のナビゲーションタグ。
+   - **SECTION 1: 企業魅力・強み（インフォグラフィック）:**
+     - 強みや実績数値をカードデザインで強調。
+     - 選考・アサインのプロセス等は、Tailwind CSSによるステップ型のフロー図（ダイアグラム）として視覚化。
+   - **SECTION 2: 面接前確認事項（理念・カルチャー・条件面）:**
+     - 理念・バリュー（行動指針など）を綺麗に整理。
+     - 候補者が使える「具体例を交えた模範回答（★回答例★）」を表示。
+     - 条件面（転勤・勤務地など）の質問・標準回答・実態背景をカード等で整理。
+   - **SECTION 3: 想定質問・必須問い対策:**
+     - 原文のニュアンス、面接官の意図、NG回答例、BETTER回答例を一切省略せず掲載。
+     - 各質問ごとに「NGな軸（赤系）」「BETTERな軸（緑系）」「重要注意点（オレンジ系）」「具体的な模範回答例（青・緑系）」を装飾ブロックで色分け。
+   - **SECTION 4: 参考URL集:**
+     - 参考URLを、タップしやすいカード型のリンク一覧として設置（`target="_blank"` を付与）。
+
+3. **レスポンシブ＆印刷対応:**
+   - スマホ・PC完全対応。
+   - `@media print` 設定を入れ、印刷時にはナビゲーションや不要な装飾が非表示になり、A4で綺麗に印刷できるデザインに調整。
+
+---
+
+### 【ユーザーが投入する提供データのフォーマット】
+
+■ 対象企業名：
+■ 企業メインカラーイメージ：
+■ 1. 企業の魅力・強み：
+■ 2. 面接前確認事項：
+■ 3. 想定質問・対策内容：
+■ 4. 参考URL集：</pre>
+            </div>
+        </section>
+
+
+        <!-- SECTION 3: Format -->
+        <section id="section-format" class="scroll-mt-20 print-break-inside-avoid">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. ユーザーが入力する【提供データ】フォーマット</h2>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                Gemを作成した後は、チャット画面に以下のフォーマット（ダミーデータ例）のようにテキストを入力して送信します。
+            </p>
+
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <pre class="text-xs font-mono leading-relaxed text-slate-700 whitespace-pre-wrap overflow-x-auto bg-slate-50 p-4 rounded-lg border border-slate-200">### 【提供データ】
 
 ■ 対象企業名：
 株式会社テクノロジー・パートナーズ
@@ -345,33 +244,41 @@ html_content = """<!DOCTYPE html>
 ・バリュー：1. 顧客主義 2. 爆速アウトプット 3. チームファースト
 ・条件面：基本的に転勤なし。リモートワーク週3日可。想定年収500万〜700万円。
 
-■ 3. 想定質問・対策内容：
+■ 3. 想定質問・対策内容（自己紹介、価値観、情熱を持った仕事など）：
 【質問1】自己紹介と志望動機
 ・意図：再現性のある強みと自社カルチャーのマッチ度確認
 ・NG軸：前職の不満メイン、スキルアピールのみで理念共感がゼロ
 ・BETTER軸：前職での具体的な原体験 ＋ 企業のミッションへの接続
-・★回答例★：「〜〜〜〜〜〜〜〜〜」
+・★回答例★：「前職では〜〜の課題に対し〇〇を実行しました。貴社のミッションである〜〜に強く共感し…」
 
 ■ 4. 参考URL集（公式HP、事例ページなど）：
 ・コーポレートサイト：https://example.com
 ・社員インタビュー：https://example.com/interview</pre>
+            </div>
+        </section>
 
-        <h2>4. NotebookLMを活用した「爆速データ整理術」</h2>
-        <p>企業サイト、求人票、面接ノウハウ、面談メモなどの情報がバラバラに存在する場合は、<strong>NotebookLM</strong>を併用すると一瞬で上記フォーマットを作成できます。</p>
 
-        <div class="card">
-            <h3><span class="badge">手順</span>NotebookLM 連携ステップ</h3>
-            <ol>
-                <li><strong>NotebookLM</strong>（<code style="color:#2563eb;">notebooklm.google.com</code>）を開き、新しいノートブックを作成。</li>
-                <li>求人票（PDF）、企業HPのURL、過去の面接フィードバック等の資料をソースとしてアップロード。</li>
-                <li>チャット欄に下記の「抽出プロンプト」を入力して実行。</li>
-                <li>出力された結果をコピーして、Gemini（カスタムGem）のトークに貼り付ける。</li>
-            </ol>
-        </div>
+        <!-- SECTION 4: NotebookLM -->
+        <section id="section-notebooklm" class="scroll-mt-20 print-break-inside-avoid">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. NotebookLMを活用した「爆速データ整理術」</h2>
+            </div>
 
-        <div class="tip-box">
-            <div class="tip-title">💡 NotebookLM用 抽出プロンプト</div>
-            <pre style="background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; margin: 4px 0 0 0;">アップロードした資料から、以下のフォーマットに沿って情報を整理・抽出してください。情報がない部分は「特記事項なし」としてください。
+            <div class="bg-emerald-50/50 border border-emerald-200 rounded-xl p-6 shadow-sm">
+                <h3 class="text-base font-bold text-emerald-950 flex items-center gap-2 mb-3">
+                    <span>💡 散乱した情報を一瞬でフォーマット整形する手順</span>
+                </h3>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700 leading-relaxed mb-6">
+                    <li><b class="text-slate-900">NotebookLM</b>（<code class="text-blue-600 bg-white px-1.5 py-0.5 rounded border border-slate-200">notebooklm.google.com</code>）を開き、新しいノートブックを作成。</li>
+                    <li>求人票（PDF）、企業HPのURL、面談メモなどをソースとして一括アップロード。</li>
+                    <li>チャット欄に下記の「抽出プロンプト」を入力して実行。</li>
+                    <li>出力されたテキストを全コピーして、作成した Gem に貼り付けるだけ！</li>
+                </ol>
+
+                <div class="bg-white border border-emerald-300 rounded-lg p-4 shadow-inner">
+                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide block mb-2">NotebookLM用 抽出プロンプト</span>
+                    <pre class="text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed">アップロードした資料から、以下のフォーマットに沿って情報を整理・抽出してください。情報がない部分は「特記事項なし」としてください。
 
 ■ 対象企業名：
 ■ 企業メインカラーイメージ：
@@ -379,42 +286,79 @@ html_content = """<!DOCTYPE html>
 ■ 2. 面接前確認事項（企業理念、行動指針、条件面）：
 ■ 3. 想定質問・対策内容（意図、NG軸、BETTER軸、模範回答）：
 ■ 4. 参考URL集：</pre>
-        </div>
+                </div>
+            </div>
+        </section>
 
-        <h2>5. クオリティを劇的に引き上げる 4つの Tips</h2>
 
-        <div class="card">
-            <div class="tip-title">Tip 1: カラーイメージの指定を具現化する</div>
-            <p>単に「青」と指定するより、「ダークネイビー（#0A192F）とスカイブルー」や「情熱的なエンジ色とゴールド」のようにベース色とアクセント色を補足指定すると、Tailwind CSSでのグラデーションやカードのデザイン品質が跳ね上がります。</p>
-        </div>
+        <!-- SECTION 5: Tips -->
+        <section id="section-tips" class="scroll-mt-20 print-break-inside-avoid">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. クオリティを劇的に引き上げる 4つの Tips</h2>
+            </div>
 
-        <div class="card">
-            <div class="tip-title">Tip 2: 「★回答例★」は口語体で具体的に入れる</div>
-            <p>プロンプトで装飾ブロック（緑系ボックス）として表示される設計になっているため、抽象的な箇条書きではなく「〜〜〜と考え、〇〇を実行しました」という実際の面接で発話するセリフ形式で入力すると、候補者にとって非常に実用的になります。</p>
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Tip 1 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-rose-100 text-rose-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 01</span>
+                            <h3 class="font-bold text-slate-800 text-sm">カラーイメージの具現化</h3>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            単に「青」と指定するより、「ダークネイビー（#0A192F）とスカイブルー」のようにベース色とアクセント色を補足指定すると、グラデーションやカードのデザイン性が大幅に向上します。
+                        </p>
+                    </div>
+                </div>
 
-        <div class="card">
-            <div class="tip-title">Tip 3: コード出力が途中で止まった場合の対処</div>
-            <p>長文HTMLのため、生成が途中で止まることがあります。その際は焦らず「<code>コードの続きを ```html から出力してください</code>」と指示を出すことで、正確に続きを出力させることができます。</p>
-        </div>
+                <!-- Tip 2 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 02</span>
+                            <h3 class="font-bold text-slate-800 text-sm">「★回答例★」は口語体で入れる</h3>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            回答例はデザイン上ハイライト表示されるため、「〜と考え、〇〇を実行しました」という実際の面接で発話するセリフ形式で入力しておくと候補者にとって実用的になります。
+                        </p>
+                    </div>
+                </div>
 
-        <div class="card">
-            <div class="tip-title">Tip 4: 保存とPDF化の簡単テクニック</div>
-            <p>出力されたHTMLコードをコピーし、<code>選考対策ガイド.html</code> という名前で保存。ブラウザで開いて <code>Ctrl + P</code>（Macは <code>Cmd + P</code>）を押すと、プロンプトに組み込まれた <code>@media print</code> スタイルにより、ヘッダー等の不要要素が自動で隠れ、きれいな印刷/PDF保存が可能です。</p>
-        </div>
+                <!-- Tip 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 03</span>
+                            <h3 class="font-bold text-slate-800 text-sm">コードが途中で止まった場合</h3>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            長文HTMLのため生成が途中で止まることがあります。その際は慌てず「<code class="bg-slate-100 text-slate-800 px-1 rounded">コードの続きを ```html から出力してください</code>」と指示を出すと正確に結合できます。
+                        </p>
+                    </div>
+                </div>
 
-        <div class="footer">
-            © 選考対策ガイド HTML Gem 運用マニュアル — Generated for Team Distribution
-        </div>
-    </div>
-</div>
+                <!-- Tip 4 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded">TIP 04</span>
+                            <h3 class="font-bold text-slate-800 text-sm">保存とPDF化テクニック</h3>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            出力コードを <code class="bg-slate-100 text-slate-800 px-1 rounded">選考対策.html</code> で保存しブラウザで開く。<code class="bg-slate-100 text-slate-800 px-1 rounded">Ctrl + P</code>（Macは <code class="bg-slate-100 text-slate-800 px-1 rounded">Cmd + P</code>）を押すと、組み込まれた印刷スタイルによりヘッダー類が消えて綺麗なA4 PDFが作れます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs text-center py-6 border-t border-slate-800 mt-12 no-print">
+        <p>© 選考対策ガイド HTML Gem 運用マニュアル — Optimized for Gemini & Tailwind CSS</p>
+    </footer>
 
 </body>
 </html>
-"""
-
-with open("選考対策Gem_作成・運用レジュメ.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-weasyprint.HTML(string=html_content).write_pdf("選考対策Gem_作成・運用レジュメ.pdf")
-print("PDF and HTML generated successfully.")
